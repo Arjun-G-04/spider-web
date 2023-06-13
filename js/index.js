@@ -1,41 +1,68 @@
 // VARIABLES
 
 class PuzzleItem {
-    constructor(id, position, colour) {
+    constructor(id, colour) {
         this.id = id ;
-        this.position = position ;
         this.colour = colour ;
     }
 }
 
+// JS objects
 let squares = [] ;
 let changed = true ;
-squares.push(new PuzzleItem('1', {r:1, c:1}, "rgba(255, 0, 0, 0.7)")) ;
-squares.push(new PuzzleItem('2', {r:1, c:2}, "rgba(255, 0, 0, 0.7)")) ;
-squares.push(new PuzzleItem('3', {r:1, c:3}, "rgba(255, 0, 0, 0.7)")) ;
-squares.push(new PuzzleItem('4', {r:2, c:1}, "rgba(0, 255, 0, 0.7)")) ;
-squares.push(new PuzzleItem('5', {r:2, c:2}, "rgba(0, 255, 0, 0.7)")) ;
-squares.push(new PuzzleItem('6', {r:2, c:3}, "rgba(0, 255, 0, 0.7)")) ;
-squares.push(new PuzzleItem('7', {r:3, c:1}, "rgba(0, 0, 255, 0.7)")) ;
-squares.push(new PuzzleItem('8', {r:3, c:2}, "rgba(0, 0, 255, 0.7)")) ;
-squares.push(new PuzzleItem('9', {r:3, c:3}, "rgba(0, 0, 255, 0.7)")) ;
+squares.push(new PuzzleItem('1', "rgba(255, 0, 0, 0.7)")) ;
+squares.push(new PuzzleItem('2', "rgba(255, 0, 0, 0.7)")) ;
+squares.push(new PuzzleItem('3', "rgba(255, 0, 0, 0.7)")) ;
+squares.push(new PuzzleItem('4', "rgba(0, 255, 0, 0.7)")) ;
+squares.push(new PuzzleItem('5', "rgba(0, 255, 0, 0.7)")) ;
+squares.push(new PuzzleItem('6', "rgba(0, 255, 0, 0.7)")) ;
+squares.push(new PuzzleItem('7', "rgba(0, 0, 255, 0.7)")) ;
+squares.push(new PuzzleItem('8', "rgba(0, 0, 255, 0.7)")) ;
+squares.push(new PuzzleItem('0', "rgba(0, 0, 0, 0.7)")) ;
+
+// Document objects
+let elements = [] ;
+squares.forEach((item) => {
+    let gridItem = document.createElement('div') ;
+    gridItem.classList.add('grid-item') ;
+    gridItem.setAttribute('id', item.id) ;
+    gridItem.style.backgroundColor = item.colour ;
+    elements.push(gridItem) ;
+}) ;
 
 // FUNCTIONS
-function isEligible(p1, p2) {
-    if (p1.r === p2.r) {
-        if (Math.abs(p1.c - p2.c) === 1) {
-            return true ;
-        } else {
-            return false ;
-        }
-    } else if (p1.c === p2.c) {
-        if (Math.abs(p1.r - p2.r) === 1) {
-            return true ;
-        } else {
-            return false ;
-        }
+function isEligible(item, empty) {
+    let givenIndex = elements.indexOf(item) ;
+    let emptyIndex = elements.indexOf(empty) ;
+
+    let eligible = [[1, 3], [0, 2, 4], [1, 5], [0, 4, 6], [1, 3, 5, 7], [2, 4, 8], [3, 7], [4, 6, 8], [5, 7]] ;
+    if (eligible[emptyIndex].includes(givenIndex)) {
+        return true ;
     } else {
-        return false
+        return false ;
+    }
+}
+
+function randomOrder() {
+    while (true) {
+        let count = 0 ;
+        elements.sort(() => Math.random() - 0.5) ;
+        
+        for (i = 0 ; i < elements.length - 1 ; i++) {
+            for (j = i + 1 ; j < elements.length ; j++) {
+                let first = parseInt(elements[i].id) ;
+                let second = parseInt(elements[j].id) ;
+                if (first != 0 && second != 0) {
+                    if (second < first) {
+                        count += 1 ;
+                    }
+                }
+            }
+        }
+
+        if (count % 2 === 0) {
+            break
+        }
     }
 }
 
@@ -48,14 +75,8 @@ function main() {
     // Render the squares
     if (changed) {
         box.innerHTML = "" ;
-        squares.forEach((item) => {
-            let gridItem = document.createElement('div') ;
-            gridItem.classList.add('grid-item') ;
-            gridItem.setAttribute('id', item.id) ;
-            gridItem.style.backgroundColor = item.colour ;
-            gridItem.style.gridRowStart = item.position.r ;
-            gridItem.style.gridColumnStart = item.position.c ;
-            box.appendChild(gridItem) ;
+        elements.forEach((item) => {
+            box.appendChild(item) ;
         }) ;
     }
     changed = false ;
@@ -66,41 +87,15 @@ function main() {
 // INPUT CONTROL
 
 window.requestAnimationFrame(main) ;
-
-let prevItem = null ;
+randomOrder() ;
 box.addEventListener("click", (e) => {
     clickedItem = e.target ;
+    emptyItem = document.getElementById("0") ;
 
-    if (prevItem != null) {
-        id1 = prevItem.id ;
-        id2 = clickedItem.id ;
-
-        if (id1 != id2) {
-            item1 = null ;
-            item2 = null ;
-            console.log(id1, id2)
-            console.log(squares)
-            squares.forEach((item) => {
-                if (item.id === id1) {
-                    item1 = item ;
-                }
-
-                if (item.id === id2) {
-                    item2 = item ;
-                }
-            }) ;
-
-            p1 = item1.position
-            p2 = item2.position
-            if (isEligible(p1, p2)) {
-                item1.position = p2 ;
-                item2.position = p1 ;
-                changed = true ;
-            }
-        }
-
-        prevItem = null ;
-    } else {
-        prevItem = clickedItem ;
+    if (isEligible(clickedItem, emptyItem)) {
+        let i1 = elements.indexOf(clickedItem) ;
+        let i2 = elements.indexOf(emptyItem) ;
+        [elements[i1], elements[i2]] = [elements[i2], elements[i1]] ;
+        changed = true ;
     }
 }) ;
