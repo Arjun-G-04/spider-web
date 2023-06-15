@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
 * {
     padding: 0;
     margin: 0;
@@ -15,19 +17,66 @@
     overflow: hidden;
 }
 
+#playArea {
+    display: flex;
+    gap: 30px ;
+    justify-content: center;
+    align-items: center;
+    flex-flow: row wrap;
+}
+
 #box {
     display: grid;
     grid-template-columns: repeat(3, 1fr) ;
     grid-template-rows: repeat(3, 1fr) ;
     width: 85vmin ;
     height: 85vmin ;
-    border: 3px solid rgba(235, 229, 229, 0.7);
+    border: 3px solid rgb(255, 255, 255);
     border-radius: 10px;
-    background-color: rgba(235, 229, 229, 0.5);
+    background-image: url("../assets/cat.jpeg");
+    background-size: 85vmin 85vmin;
 }
 
 .grid-item {
-    background-color: rgba(255, 0, 0, 0.7);
     border: 1.5px solid rgba(235, 229, 229, 0.8);
+    background-image: url("../assets/cat.jpeg");
+    background-size: 85vmin 85vmin;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    background-position: top 0vmin left 0vmin;
+}
+
+#randomize {
+    position: absolute;
+    left: 30px;
+    top: 30px;
+    padding: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    cursor: pointer;
+    background: linear-gradient(to right, rgb(255, 200, 0), rgb(234, 134, 4));
+    border: 2px solid white ;
+    color: black;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+#fixedImg {
+    width: 85vmin;
+    height: 85vmin;
+}
+
+#imageUpload {
+    background: linear-gradient(to right, rgb(255, 200, 0), rgb(234, 134, 4));;
+    padding: 5px;
+    font-family: 'Poppins', sans-serif;
+    border: 2px solid white ;
+    border-radius: 10px;
+}
+
+#refImage {
+    width: 30vmin;
+    height: 30vmin;
+    border: 3px solid white;
     border-radius: 5px;
 }

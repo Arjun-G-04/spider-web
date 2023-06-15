@@ -1,34 +1,29 @@
 // VARIABLES
 
+let squares = [] ;
+let changed = true ;
+let started = false ;
+let uploaded = false ;
+let imgURL = "../assets/cat.jpeg" ;
+let refImage = document.getElementById('refImage') ;
+
 class PuzzleItem {
-    constructor(id, colour) {
+    constructor(id, position) {
         this.id = id ;
-        this.colour = colour ;
+        this.position = position ;
     }
 }
 
 // JS objects
-let squares = [] ;
-let changed = true ;
-squares.push(new PuzzleItem('1', "rgba(255, 0, 0, 0.7)")) ;
-squares.push(new PuzzleItem('2', "rgba(255, 0, 0, 0.7)")) ;
-squares.push(new PuzzleItem('3', "rgba(255, 0, 0, 0.7)")) ;
-squares.push(new PuzzleItem('4', "rgba(0, 255, 0, 0.7)")) ;
-squares.push(new PuzzleItem('5', "rgba(0, 255, 0, 0.7)")) ;
-squares.push(new PuzzleItem('6', "rgba(0, 255, 0, 0.7)")) ;
-squares.push(new PuzzleItem('7', "rgba(0, 0, 255, 0.7)")) ;
-squares.push(new PuzzleItem('8', "rgba(0, 0, 255, 0.7)")) ;
-squares.push(new PuzzleItem('0', "rgba(0, 0, 0, 0.7)")) ;
-
-// Document objects
-let elements = [] ;
-squares.forEach((item) => {
-    let gridItem = document.createElement('div') ;
-    gridItem.classList.add('grid-item') ;
-    gridItem.setAttribute('id', item.id) ;
-    gridItem.style.backgroundColor = item.colour ;
-    elements.push(gridItem) ;
-}) ;
+squares.push(new PuzzleItem('1', "top 0vmin left 0vmin")) ;
+squares.push(new PuzzleItem('2', "top 0vmin left -28.33vmin")) ;
+squares.push(new PuzzleItem('3', "top 0vmin left -56.66vmin")) ;
+squares.push(new PuzzleItem('4', "top -28.33vmin left 0vmin")) ;
+squares.push(new PuzzleItem('5', "top -28.33vmin left -28.33vmin")) ;
+squares.push(new PuzzleItem('6', "top -28.33vmin left -56.66vmin")) ;
+squares.push(new PuzzleItem('7', "top -56.66vmin left 0vmin")) ;
+squares.push(new PuzzleItem('8', "top -56.66vmin left -28.33vmin")) ;
+squares.push(new PuzzleItem('0', "top -56.66vmin left -56.66vmin")) ;
 
 // FUNCTIONS
 function isEligible(item, empty) {
@@ -66,28 +61,74 @@ function randomOrder() {
     }
 }
 
+function createElementsList(imgURL) {
+    let elements = [] ;
+    squares.forEach((item) => {
+        let gridItem = document.createElement('div') ;
+        gridItem.classList.add('grid-item') ;
+        gridItem.setAttribute('id', item.id) ;
+        gridItem.style.backgroundPosition = item.position ;
+        gridItem.style.backgroundImage = `url(${imgURL})` ;
+        if (item.id === '0') {
+            gridItem.style.background = 'none' ;
+            gridItem.style.backgroundColor = 'rgba(225,225,225,0.8)' ;
+        }
+        elements.push(gridItem) ;
+    }) ;
+
+    return elements ;
+}
+
 // MAIN FUNCTION
 
 function main() {
     window.requestAnimationFrame(main) ; 
 
-
     // Render the squares
     if (changed) {
         box.innerHTML = "" ;
         elements.forEach((item) => {
+            if (item.id === '0') {
+                item.style.background = 'none' ;
+                item.style.backgroundColor = 'rgba(225,225,225,0.8)' ;
+            }
             box.appendChild(item) ;
         }) ;
+        
+        let solved = true ;
+        for (i = 0 ; i <= 7 ; i++) {
+            if (parseInt(elements[i].id) != (i+1)) {
+                solved = false ;
+            }
+        }
+
+        if (solved && started) {
+            alert("Awesome!!! You have solved the puzzle :)") ;
+            changed = false ;
+            started = false ;
+        }
     }
     changed = false ;
 
+    if (uploaded) {
+        elements = createElementsList(imgURL) ;
+        box.style.backgroundImage = `url(${imgURL})` ;
+        refImage.src = `${imgURL}`
+        changed = true ;
+        uploaded = false ;
+        started = false ;
+    }
 } 
 
 
 // INPUT CONTROL
 
+let elements = createElementsList(imgURL) ;
+let randButton = document.getElementById("randomize") ;
+let imageUpload = document.getElementById("imageUpload") ;
+
 window.requestAnimationFrame(main) ;
-randomOrder() ;
+
 box.addEventListener("click", (e) => {
     clickedItem = e.target ;
     emptyItem = document.getElementById("0") ;
@@ -97,5 +138,18 @@ box.addEventListener("click", (e) => {
         let i2 = elements.indexOf(emptyItem) ;
         [elements[i1], elements[i2]] = [elements[i2], elements[i1]] ;
         changed = true ;
+        started = true ;
     }
+}) ;
+
+randButton.addEventListener("click", (e) => {
+    randomOrder() ;
+    changed = true ;
+}) ;
+
+imageUpload.addEventListener('change', (e) => {
+    let uploadedImage = imageUpload.files[0] ;
+    console.log(uploadedImage)
+    imgURL = URL.createObjectURL(uploadedImage) ;
+    uploaded = true ;
 }) ;
