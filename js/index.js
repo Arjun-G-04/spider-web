@@ -6,6 +6,10 @@ let started = false ;
 let uploaded = false ;
 let imgURL = "../assets/cat.jpeg" ;
 let refImage = document.getElementById('refImage') ;
+let dataURL = null ;
+let images = [] ;
+let saved = false ;
+let keys = Object.keys(localStorage) ;
 
 class PuzzleItem {
     constructor(id, position) {
@@ -107,8 +111,45 @@ function main() {
             changed = false ;
             started = false ;
         }
+
+        if (!started) {
+            savedImages.innerHTML = "<h3>Saved Images</h3>" ;
+            let i = 1 ;
+            images.forEach((url) => {
+                imageElem = document.createElement('button') ;
+                imageElem.textContent = "Image " + i.toString() ;
+                imageElem.classList.add("options") ;
+                savedImages.appendChild(imageElem) ;
+
+                imageElem.addEventListener('click', () => {
+                    imgURL = url ;
+                    uploaded = true ;
+                })
+
+                i += 1 ;
+            })
+        }
     }
     changed = false ;
+
+    if (saved) {
+        savedImages.innerHTML = "<h3>Saved Images</h3>" ;
+        let i = 1 ;
+        images.forEach((url) => {
+            imageElem = document.createElement('button') ;
+            imageElem.textContent = "Image " + i.toString() ;
+            imageElem.classList.add("options") ;
+            savedImages.appendChild(imageElem) ;
+
+            imageElem.addEventListener('click', () => {
+                imgURL = url ;
+                uploaded = true ;
+            })
+
+            i += 1 ;
+        })
+        saved = false ;
+    }
 
     if (uploaded) {
         elements = createElementsList(imgURL) ;
@@ -126,6 +167,11 @@ function main() {
 let elements = createElementsList(imgURL) ;
 let randButton = document.getElementById("randomize") ;
 let imageUpload = document.getElementById("imageUpload") ;
+let saveButton = document.getElementById("save") ;
+
+keys.forEach((key) => {
+    images.push(localStorage.getItem(key)) ;
+})
 
 window.requestAnimationFrame(main) ;
 
@@ -149,7 +195,31 @@ randButton.addEventListener("click", (e) => {
 
 imageUpload.addEventListener('change', (e) => {
     let uploadedImage = imageUpload.files[0] ;
-    console.log(uploadedImage)
     imgURL = URL.createObjectURL(uploadedImage) ;
     uploaded = true ;
+
+    let fr = new FileReader() ;
+    fr.readAsDataURL(uploadedImage) ;
+
+    fr.addEventListener('load', () => {
+        dataURL = fr.result ; 
+    }) ;
 }) ;
+
+saveButton.addEventListener('click', () => {
+    if (dataURL != null) {
+        if (!images.includes(dataURL)) {
+            images.push(dataURL) ;
+            localStorage.setItem("image" + (images.length).toString(), dataURL) ;
+            saved = true ;
+        }
+    }
+}) ;
+
+/*
+imageUploadLinkButton.addEventListener('click', (e) => {
+    let imageUploadLink = document.getElementById('imageUploadLink') ;
+    imgURL = imageUploadLink.value ;
+    uploaded = true ;
+}) ;
+*/
